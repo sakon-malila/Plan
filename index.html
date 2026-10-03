@@ -24,6 +24,7 @@
       --accent-green-glow: rgba(0, 230, 118, 0.35);
       --accent-orange: #FF9100;
       --accent-blue: #00E5FF;
+      --accent-purple: #D500F9;
       
       --text-main: #FFFFFF;
       --text-sub: #B0BEC5;
@@ -51,7 +52,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -59,11 +60,11 @@
     /* Header Design */
     header {
       text-align: center;
-      padding: 24px 16px 16px;
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
+      padding: 22px 16px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
       border-radius: var(--radius);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       border: 1px solid var(--card-border);
       box-shadow: var(--shadow);
     }
@@ -82,17 +83,53 @@
     }
 
     .brand-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-sub);
       margin-top: 4px;
       font-weight: 300;
+    }
+
+    /* View Mode Switcher */
+    .view-mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+    }
+
+    .view-mode-btn {
+      flex: 1;
+      padding: 10px 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-weight: 500;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .view-mode-btn.active {
+      background: rgba(0, 229, 255, 0.18);
+      color: var(--accent-blue);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      font-weight: 600;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
     }
 
     /* Day Switcher Tabs */
     .day-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       background: rgba(0, 0, 0, 0.25);
       padding: 6px;
       border-radius: 14px;
@@ -101,12 +138,12 @@
 
     .tab-btn {
       flex: 1;
-      padding: 12px 8px;
+      padding: 10px 8px;
       background: transparent;
       border: none;
       color: var(--text-sub);
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.25s ease;
@@ -118,7 +155,7 @@
 
     .tab-btn span.day-num {
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .tab-btn.active {
@@ -132,12 +169,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       padding: 0 4px;
     }
 
     .day-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -148,7 +185,7 @@
       background: rgba(0, 230, 118, 0.15);
       color: var(--accent-green);
       border: 1px solid var(--accent-green);
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 500;
@@ -164,13 +201,7 @@
       color: #000;
     }
 
-    /* Itinerary List */
-    .place-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
+    /* Common Card Styling */
     .place-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -190,6 +221,11 @@
       border-color: var(--accent-green);
     }
 
+    .place-card.drag-over {
+      border: 2px dashed var(--accent-green);
+      box-shadow: 0 0 15px var(--accent-green-glow);
+    }
+
     .place-card.is-locked {
       border-left: 4px solid var(--badge-fixed);
       background: rgba(255, 61, 0, 0.08);
@@ -198,12 +234,14 @@
     .drag-handle {
       color: var(--text-muted);
       cursor: grab;
-      padding: 4px;
+      padding: 6px;
       font-size: 1.1rem;
+      touch-action: none;
     }
 
     .drag-handle:active {
       cursor: grabbing;
+      color: var(--accent-green);
     }
 
     .place-time-badge {
@@ -212,14 +250,14 @@
       align-items: center;
       justify-content: center;
       min-width: 75px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.35);
       padding: 8px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .time-start {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--accent-green);
     }
@@ -312,6 +350,101 @@
       background: #FF1744;
       color: #fff;
       border-color: #FF1744;
+    }
+
+    /* Mode 1: Standard Place List */
+    .place-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Mode 2: Interactive Route Timeline View */
+    .timeline-route-view {
+      position: relative;
+      padding-left: 36px;
+      margin-top: 10px;
+    }
+
+    /* Continuous Glowing Route Line Path */
+    .timeline-route-view::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      bottom: 30px;
+      left: 17px;
+      width: 4px;
+      background: linear-gradient(180deg, var(--accent-green) 0%, var(--accent-blue) 50%, var(--accent-orange) 100%);
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(0, 230, 118, 0.4);
+      z-index: 1;
+    }
+
+    .timeline-item-wrapper {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    /* Node Waypoint Circle on Route Path */
+    .route-node-circle {
+      position: absolute;
+      left: -36px;
+      top: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #0D1B2A;
+      border: 2px solid var(--accent-green);
+      box-shadow: 0 0 12px var(--accent-green-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-green);
+      font-size: 0.85rem;
+      z-index: 3;
+      transition: all 0.25s ease;
+    }
+
+    .timeline-item-wrapper:hover .route-node-circle {
+      transform: scale(1.15);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+    }
+
+    .timeline-item-wrapper.is-locked .route-node-circle {
+      border-color: var(--badge-fixed);
+      color: var(--badge-fixed);
+      box-shadow: 0 0 12px rgba(255, 61, 0, 0.5);
+    }
+
+    /* Route Travel Connector Segment */
+    .route-travel-connector {
+      position: relative;
+      padding-left: 6px;
+      margin: 6px 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .route-travel-badge {
+      background: rgba(15, 32, 39, 0.85);
+      border: 1px dashed rgba(0, 229, 255, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      backdrop-filter: blur(6px);
+    }
+
+    .route-travel-badge i {
+      font-size: 0.8rem;
     }
 
     /* Modal Styling */
@@ -422,8 +555,18 @@
       <div class="brand-title">
         <i class="fa-solid fa-compass"></i> เต้ยไปเรื่อย
       </div>
-      <div class="brand-subtitle">จัดทริปเที่ยวนครนายก 3 วัน 2 คืน (คำนวณเวลาอัตโนมัติ)</div>
+      <div class="brand-subtitle">จัดทริปเที่ยวนครนายก 3 วัน 2 คืน (คำนวณเวลาและเส้นทางอัตโนมัติ)</div>
     </header>
+
+    <!-- View Mode Selector -->
+    <div class="view-mode-tabs">
+      <button class="view-mode-btn active" id="viewBtnRoute" onclick="switchView('route')">
+        <i class="fa-solid fa-route"></i> เส้นทางไทม์ไลน์
+      </button>
+      <button class="view-mode-btn" id="viewBtnList" onclick="switchView('list')">
+        <i class="fa-solid fa-list-check"></i> บัตรรายการ
+      </button>
+    </div>
 
     <!-- Day Navigation -->
     <div class="day-tabs">
@@ -444,15 +587,15 @@
     <!-- Day Info & Actions -->
     <div class="day-summary">
       <div class="day-title" id="dayTitle">
-        <i class="fa-regular fa-calendar-days" style="color: var(--accent-green);"></i> แผนการท่องเที่ยว
+        <i class="fa-solid fa-route" style="color: var(--accent-blue);"></i> เส้นทางไทม์ไลน์ วันที่ 5
       </div>
       <button class="add-btn" onclick="openAddModal()">
         <i class="fa-solid fa-plus"></i> เพิ่มสถานที่
       </button>
     </div>
 
-    <!-- List Container -->
-    <div class="place-list" id="placeList"></div>
+    <!-- List & Route Container -->
+    <div id="placeListContainer"></div>
 
     <footer>
       ออกแบบสำหรับใช้งานใน Antigravity IDE & Mobiles | เต้ยไปเรื่อย © 2026
@@ -482,8 +625,9 @@
   </div>
 
   <script>
-    // Master Itinerary Data
+    // Master State
     let currentDay = 5;
+    let currentView = 'route'; // 'route' or 'list'
 
     const itineraryData = {
       5: {
@@ -537,73 +681,254 @@
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     }
 
+    // Icon helper according to place type
+    function getPlaceIcon(name) {
+      const n = name.toLowerCase();
+      if (n.includes('รถ') || n.includes('มอเตอร์ไซค์') || n.includes('atv')) return 'fa-motorcycle';
+      if (n.includes('ที่พัก') || n.includes('เช็คอิน') || n.includes('เช็คเอาท์') || n.includes('รีสอร์ท')) return 'fa-hotel';
+      if (n.includes('วัด') || n.includes('วนาราม')) return 'fa-gopuram';
+      if (n.includes('ทาน') || n.includes('กิน') || n.includes('เบียร์') || n.includes('อาหาร')) return 'fa-utensils';
+      if (n.includes('น้ำตก') || n.includes('อ่างเก็บน้ำ') || n.includes('ล่องแก่ง') || n.includes('เขื่อน')) return 'fa-water';
+      if (n.includes('สะพาน') || n.includes('ทุ่งนา') || n.includes('ธรรมชาติ')) return 'fa-leaf';
+      if (n.includes(' Grab') || n.includes('รถตู้') || n.includes('บขส')) return 'fa-bus';
+      if (n.includes('รถไฟ')) return 'fa-train';
+      return 'fa-location-dot';
+    }
+
     // Render Current Day Schedule
     function renderSchedule() {
       const dayData = itineraryData[currentDay];
-      const container = document.getElementById('placeList');
+      const container = document.getElementById('placeListContainer');
       container.innerHTML = '';
 
       let currentMins = timeToMinutes(dayData.startTime);
 
-      dayData.places.forEach((place, index) => {
-        // If block has a fixed lock time, override running time
-        if (place.isLocked && place.lockTime) {
-          currentMins = timeToMinutes(place.lockTime);
-        }
+      if (currentView === 'route') {
+        const routeView = document.createElement('div');
+        routeView.className = 'timeline-route-view';
 
-        const startTimeStr = minutesToTime(currentMins);
-        const endMins = currentMins + place.duration;
-        const endTimeStr = minutesToTime(endMins);
+        dayData.places.forEach((place, index) => {
+          if (place.isLocked && place.lockTime) {
+            currentMins = timeToMinutes(place.lockTime);
+          }
 
-        const card = document.createElement('div');
-        card.className = `place-card ${place.isLocked ? 'is-locked' : ''}`;
-        card.draggable = true;
-        card.dataset.index = index;
+          const startTimeStr = minutesToTime(currentMins);
+          const endMins = currentMins + place.duration;
+          const endTimeStr = minutesToTime(endMins);
+          const iconClass = getPlaceIcon(place.name);
 
-        card.innerHTML = `
-          <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
-          <div class="place-time-badge">
-            <span class="time-start">${startTimeStr}</span>
-            <span class="time-end">${endTimeStr}</span>
-          </div>
-          <div class="place-info">
-            <div class="place-name">
-              ${place.name}
-              ${place.isLocked ? `<span class="tag-lock"><i class="fa-solid fa-lock"></i> ล็อกเวลา</span>` : ''}
+          const wrapper = document.createElement('div');
+          wrapper.className = `timeline-item-wrapper ${place.isLocked ? 'is-locked' : ''}`;
+          wrapper.dataset.index = index;
+
+          wrapper.innerHTML = `
+            <div class="route-node-circle">
+              <i class="fa-solid ${iconClass}"></i>
             </div>
-            <div class="place-duration-controls">
-              <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
-              <span class="dur-text">${place.duration} นาที</span>
-              <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
+            <div class="place-card ${place.isLocked ? 'is-locked' : ''}" draggable="true" data-index="${index}">
+              <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+              <div class="place-time-badge">
+                <span class="time-start">${startTimeStr}</span>
+                <span class="time-end">${endTimeStr}</span>
+              </div>
+              <div class="place-info">
+                <div class="place-name">
+                  ${place.name}
+                  ${place.isLocked ? `<span class="tag-lock"><i class="fa-solid fa-lock"></i> ล็อกเวลา</span>` : ''}
+                </div>
+                <div class="place-duration-controls">
+                  <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
+                  <span class="dur-text">${place.duration} นาที</span>
+                  <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
+                </div>
+              </div>
+              <div class="place-actions">
+                <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
+                <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
+                ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
             </div>
-          </div>
-          <div class="place-actions">
-            <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
-            <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
-            ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
-          </div>
-        `;
+          `;
 
-        // Attach Drag and Drop Events
-        card.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragover', handleDragOver);
-        card.addEventListener('drop', handleDrop);
-        card.addEventListener('dragend', handleDragEnd);
+          // Add travel connector line to next stop if not last
+          if (index < dayData.places.length - 1) {
+            const connector = document.createElement('div');
+            connector.className = 'route-travel-connector';
+            connector.innerHTML = `
+              <div class="route-travel-badge">
+                <i class="fa-solid fa-arrows-up-down"></i> เดินทางต่อ ~10-15 นาที
+              </div>
+            `;
+            wrapper.appendChild(connector);
+          }
 
-        container.appendChild(card);
+          // Attach drag & touch events
+          attachDragAndTouchEvents(wrapper, index);
+          routeView.appendChild(wrapper);
 
-        // Advance running clock
-        currentMins = endMins;
+          currentMins = endMins;
+        });
+
+        container.appendChild(routeView);
+
+      } else {
+        // List View Mode
+        const listView = document.createElement('div');
+        listView.className = 'place-list';
+
+        dayData.places.forEach((place, index) => {
+          if (place.isLocked && place.lockTime) {
+            currentMins = timeToMinutes(place.lockTime);
+          }
+
+          const startTimeStr = minutesToTime(currentMins);
+          const endMins = currentMins + place.duration;
+          const endTimeStr = minutesToTime(endMins);
+
+          const card = document.createElement('div');
+          card.className = `place-card ${place.isLocked ? 'is-locked' : ''}`;
+          card.draggable = true;
+          card.dataset.index = index;
+
+          card.innerHTML = `
+            <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+            <div class="place-time-badge">
+              <span class="time-start">${startTimeStr}</span>
+              <span class="time-end">${endTimeStr}</span>
+            </div>
+            <div class="place-info">
+              <div class="place-name">
+                ${place.name}
+                ${place.isLocked ? `<span class="tag-lock"><i class="fa-solid fa-lock"></i> ล็อกเวลา</span>` : ''}
+              </div>
+              <div class="place-duration-controls">
+                <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
+                <span class="dur-text">${place.duration} นาที</span>
+                <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
+              </div>
+            </div>
+            <div class="place-actions">
+              <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
+              <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
+              ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </div>
+          `;
+
+          attachDragAndTouchEvents(card, index);
+          listView.appendChild(card);
+
+          currentMins = endMins;
+        });
+
+        container.appendChild(listView);
+      }
+    }
+
+    // Drag & Touch Event Manager
+    let dragSrcIndex = null;
+
+    function attachDragAndTouchEvents(element, index) {
+      // HTML5 Drag & Drop
+      element.addEventListener('dragstart', function(e) {
+        dragSrcIndex = index;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
       });
+
+      element.addEventListener('dragover', function(e) {
+        if (e.preventDefault) e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drag-over');
+        return false;
+      });
+
+      element.addEventListener('dragleave', function() {
+        this.classList.remove('drag-over');
+      });
+
+      element.addEventListener('drop', function(e) {
+        if (e.stopPropagation) e.stopPropagation();
+        this.classList.remove('drag-over');
+        const dropIndex = Number(this.dataset.index);
+        if (dragSrcIndex !== null && dragSrcIndex !== dropIndex) {
+          const places = itineraryData[currentDay].places;
+          const [draggedItem] = places.splice(dragSrcIndex, 1);
+          places.splice(dropIndex, 0, draggedItem);
+          renderSchedule();
+        }
+        return false;
+      });
+
+      element.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      });
+
+      // Mobile Touch Dragging via Handle
+      const handle = element.querySelector('.drag-handle');
+      if (!handle) return;
+
+      handle.addEventListener('touchstart', function(e) {
+        dragSrcIndex = index;
+        element.classList.add('dragging');
+      }, { passive: true });
+
+      handle.addEventListener('touchmove', function(e) {
+        if (dragSrcIndex === null) return;
+        const touch = e.touches[0];
+        const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+        const closestNode = targetEl ? targetEl.closest('[data-index]') : null;
+
+        document.querySelectorAll('[data-index]').forEach(el => el.classList.remove('drag-over'));
+        if (closestNode && closestNode !== element) {
+          closestNode.classList.add('drag-over');
+        }
+      }, { passive: true });
+
+      handle.addEventListener('touchend', function(e) {
+        if (dragSrcIndex === null) return;
+        element.classList.remove('dragging');
+        const touch = e.changedTouches[0];
+        const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+        const closestNode = targetEl ? targetEl.closest('[data-index]') : null;
+
+        document.querySelectorAll('[data-index]').forEach(el => el.classList.remove('drag-over'));
+
+        if (closestNode) {
+          const dropIndex = Number(closestNode.dataset.index);
+          if (dragSrcIndex !== dropIndex) {
+            const places = itineraryData[currentDay].places;
+            const [draggedItem] = places.splice(dragSrcIndex, 1);
+            places.splice(dropIndex, 0, draggedItem);
+            renderSchedule();
+          }
+        }
+        dragSrcIndex = null;
+      });
+    }
+
+    // Switch View Mode ('route' | 'list')
+    function switchView(mode) {
+      currentView = mode;
+      document.getElementById('viewBtnRoute').classList.toggle('active', mode === 'route');
+      document.getElementById('viewBtnList').classList.toggle('active', mode === 'list');
+      
+      const icon = mode === 'route' ? 'fa-route' : 'fa-list-check';
+      const modeText = mode === 'route' ? 'เส้นทางไทม์ไลน์' : 'รายการสถานที่';
+      document.getElementById('dayTitle').innerHTML = `<i class="fa-solid ${icon}" style="color: var(--accent-blue);"></i> ${modeText} วันที่ ${currentDay}`;
+      
+      renderSchedule();
     }
 
     // Tab Switcher
     function switchDay(dayNum) {
       currentDay = dayNum;
-      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+      document.querySelectorAll('.day-tabs .tab-btn').forEach((btn, idx) => {
         btn.classList.toggle('active', [5, 6, 7][idx] === dayNum);
       });
-      document.getElementById('dayTitle').innerHTML = `<i class="fa-regular fa-calendar-days" style="color: var(--accent-green);"></i> แผนการท่องเที่ยว วันที่ ${dayNum}`;
+      const icon = currentView === 'route' ? 'fa-route' : 'fa-list-check';
+      const modeText = currentView === 'route' ? 'เส้นทางไทม์ไลน์' : 'รายการสถานที่';
+      document.getElementById('dayTitle').innerHTML = `<i class="fa-solid ${icon}" style="color: var(--accent-blue);"></i> ${modeText} วันที่ ${dayNum}`;
       renderSchedule();
     }
 
@@ -633,37 +958,6 @@
     function deletePlace(index) {
       itineraryData[currentDay].places.splice(index, 1);
       renderSchedule();
-    }
-
-    // Drag & Drop Handling
-    let dragSrcIndex = null;
-
-    function handleDragStart(e) {
-      dragSrcIndex = Number(this.dataset.index);
-      this.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function handleDragOver(e) {
-      if (e.preventDefault) e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-
-    function handleDrop(e) {
-      if (e.stopPropagation) e.stopPropagation();
-      const dropIndex = Number(this.dataset.index);
-      if (dragSrcIndex !== null && dragSrcIndex !== dropIndex) {
-        const places = itineraryData[currentDay].places;
-        const [draggedItem] = places.splice(dragSrcIndex, 1);
-        places.splice(dropIndex, 0, draggedItem);
-        renderSchedule();
-      }
-      return false;
-    }
-
-    function handleDragEnd() {
-      this.classList.remove('dragging');
     }
 
     // Modal Control
