@@ -90,6 +90,107 @@
       font-weight: 300;
     }
 
+    /* Edit Control Toolbar */
+    .edit-control-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .edit-toggle-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .edit-toggle-btn.locked {
+      background: rgba(255, 145, 0, 0.15);
+      border-color: var(--accent-orange);
+      color: #FFB74D;
+    }
+
+    .edit-toggle-btn.editing {
+      background: rgba(0, 230, 118, 0.2);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      box-shadow: 0 0 12px var(--accent-green-glow);
+    }
+
+    .save-plan-btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00B0FF 100%);
+      color: #002B11;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .save-plan-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 230, 118, 0.6);
+    }
+
+    .reset-plan-btn {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-sub);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .reset-plan-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .edit-mode-banner {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .edit-mode-banner.read-only {
+      background: rgba(255, 145, 0, 0.1);
+      border: 1px solid rgba(255, 145, 0, 0.25);
+      color: #FFB74D;
+    }
+
+    .edit-mode-banner.editing {
+      background: rgba(0, 230, 118, 0.12);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--accent-green);
+    }
+
     /* View Mode Switcher */
     .view-mode-tabs {
       display: flex;
@@ -244,6 +345,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .drag-handle.disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
     }
 
     .drag-handle:active {
@@ -467,6 +573,34 @@
       border-radius: var(--radius) !important;
     }
 
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 32, 39, 0.95);
+      border: 1px solid var(--accent-green);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-green-glow);
+      backdrop-filter: blur(10px);
+      z-index: 100000;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
     /* Modal Styling */
     .modal-overlay {
       position: fixed;
@@ -578,6 +712,25 @@
       <div class="brand-subtitle">จัดทริปเที่ยวนครนายก 3 วัน 2 คืน (คำนวณเวลาและเส้นทางอัตโนมัติ)</div>
     </header>
 
+    <!-- Edit Mode Toolbar Controls -->
+    <div class="edit-control-bar">
+      <button class="edit-toggle-btn locked" id="editToggleBtn" onclick="toggleEditMode()">
+        <i class="fa-solid fa-lock"></i> โหมดอ่านอย่างเดียว (คลิกเพื่อแก้ไข)
+      </button>
+      <button class="save-plan-btn" id="savePlanBtn" onclick="savePlanToLocalStorage()" style="display: none;">
+        <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+      </button>
+      <button class="reset-plan-btn" id="resetPlanBtn" onclick="resetDefaultPlan()" style="display: none;">
+        <i class="fa-solid fa-rotate-left"></i> รีเซ็ต
+      </button>
+    </div>
+
+    <!-- Edit Status Banner -->
+    <div class="edit-mode-banner read-only" id="editBanner">
+      <i class="fa-solid fa-circle-info"></i>
+      <span id="editBannerText">🔒 โหมดอ่านอย่างเดียว: กดปุ่ม 'โหมดอ่านอย่างเดียว' ด้านบนเพื่อเปิดการขยับและปรับแต่งแผน</span>
+    </div>
+
     <!-- View Mode Selector -->
     <div class="view-mode-tabs">
       <button class="view-mode-btn active" id="viewBtnRoute" onclick="switchView('route')">
@@ -609,7 +762,7 @@
       <div class="day-title" id="dayTitle">
         <i class="fa-solid fa-route" style="color: var(--accent-blue);"></i> เส้นทางไทม์ไลน์ วันที่ 5
       </div>
-      <button class="add-btn" onclick="openAddModal()">
+      <button class="add-btn" id="addPlaceBtn" onclick="handleAddClick()">
         <i class="fa-solid fa-plus"></i> เพิ่มสถานที่
       </button>
     </div>
@@ -644,12 +797,20 @@
     </div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div class="toast-notification" id="toastBox">
+    <span id="toastMsg">บันทึกสำเร็จ</span>
+  </div>
+
   <script>
     // Master State
     let currentDay = 5;
     let currentView = 'route'; // 'route' or 'list'
+    let isEditMode = false;     // Edit protection flag
 
-    const itineraryData = {
+    const STORAGE_KEY = 'toey_itinerary_plan_data_v2';
+
+    const defaultItineraryData = {
       5: {
         startTime: "07:30",
         places: [
@@ -687,6 +848,95 @@
         ]
       }
     };
+
+    let itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+
+    // Load Plan from LocalStorage
+    function loadPlanFromLocalStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          itineraryData = parsed;
+        } catch (e) {
+          console.error('Failed to load saved plan', e);
+        }
+      }
+    }
+
+    // Save Plan to LocalStorage
+    function savePlanToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+      showToast('<i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i> บันทึกแผนการเดินทางเรียบร้อยแล้ว!');
+      isEditMode = false;
+      updateEditModeUI();
+      renderSchedule();
+    }
+
+    // Reset Plan
+    function resetDefaultPlan() {
+      if (confirm('คุณต้องการรีเซ็ตแผนการท่องเที่ยวเป็นค่าเริ่มต้นใช่หรือไม่?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+        isEditMode = false;
+        updateEditModeUI();
+        renderSchedule();
+        showToast('<i class="fa-solid fa-rotate-left"></i> คืนค่าเริ่มต้นเรียบร้อยแล้ว');
+      }
+    }
+
+    // Toggle Edit Mode State
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      updateEditModeUI();
+      renderSchedule();
+      if (isEditMode) {
+        showToast('<i class="fa-solid fa-pen-to-square" style="color: var(--accent-blue);"></i> เปิดโหมดแก้ไขแล้ว คุณสามารถลากขยับและปรับเปลี่ยนได้');
+      } else {
+        showToast('<i class="fa-solid fa-lock" style="color: var(--accent-orange);"></i> ล็อกการแก้ไขเรียบร้อยแล้ว');
+      }
+    }
+
+    // Update UI for Edit Mode Status
+    function updateEditModeUI() {
+      const toggleBtn = document.getElementById('editToggleBtn');
+      const saveBtn = document.getElementById('savePlanBtn');
+      const resetBtn = document.getElementById('resetPlanBtn');
+      const banner = document.getElementById('editBanner');
+      const bannerText = document.getElementById('editBannerText');
+
+      if (isEditMode) {
+        toggleBtn.className = 'edit-toggle-btn editing';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> กำลังอยู่ในโหมดแก้ไข (กดเพื่อล็อก)';
+        saveBtn.style.display = 'flex';
+        resetBtn.style.display = 'flex';
+
+        banner.className = 'edit-mode-banner editing';
+        bannerText.textContent = '✏️ โหมดแก้ไขเปิดอยู่: คุณสามารถลากขยับ เพิ่ม/ลบ และปรับเปลี่ยนเวลาได้ เมื่อเสร็จแล้วให้กดบันทึก';
+      } else {
+        toggleBtn.className = 'edit-toggle-btn locked';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> โหมดอ่านอย่างเดียว (คลิกเพื่อแก้ไข)';
+        saveBtn.style.display = 'none';
+        resetBtn.style.display = 'none';
+
+        banner.className = 'edit-mode-banner read-only';
+        bannerText.textContent = '🔒 โหมดอ่านอย่างเดียว: หากต้องการขยับสถานที่หรือแก้ไข ให้คลิกปุ่มเปิดโหมดแก้ไขด้านบน';
+      }
+    }
+
+    // Toast Notification Popup
+    let toastTimeout = null;
+    function showToast(htmlMsg) {
+      const toast = document.getElementById('toastBox');
+      const msg = document.getElementById('toastMsg');
+      msg.innerHTML = htmlMsg;
+      toast.classList.add('show');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
     // Helper: Convert "HH:MM" to total minutes
     function timeToMinutes(timeStr) {
@@ -741,12 +991,40 @@
           wrapper.className = `timeline-item-wrapper ${place.isLocked ? 'is-locked' : ''}`;
           wrapper.dataset.index = index;
 
+          const dragHandleHtml = isEditMode
+            ? `<div class="drag-handle" title="ลากเพื่อขยับตำแหน่ง"><i class="fa-solid fa-grip-vertical"></i></div>`
+            : `<div class="drag-handle disabled" title="เปิดโหมดแก้ไขก่อนขยับ"><i class="fa-solid fa-lock" style="font-size: 0.85rem; opacity: 0.5;"></i></div>`;
+
+          const controlsHtml = isEditMode
+            ? `
+              <div class="place-duration-controls">
+                <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
+                <span class="dur-text">${place.duration} นาที</span>
+                <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
+              </div>
+            `
+            : `
+              <div class="place-duration-controls">
+                <span class="dur-text" style="opacity: 0.8;"><i class="fa-regular fa-clock"></i> ${place.duration} นาที</span>
+              </div>
+            `;
+
+          const actionsHtml = isEditMode
+            ? `
+              <div class="place-actions">
+                <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
+                <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
+                ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
+            `
+            : '';
+
           wrapper.innerHTML = `
             <div class="route-node-circle">
               <i class="fa-solid ${iconClass}"></i>
             </div>
-            <div class="place-card ${place.isLocked ? 'is-locked' : ''}" draggable="true" data-index="${index}">
-              <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+            <div class="place-card ${place.isLocked ? 'is-locked' : ''}" draggable="${isEditMode}" data-index="${index}">
+              ${dragHandleHtml}
               <div class="place-time-badge">
                 <span class="time-start">${startTimeStr}</span>
                 <span class="time-end">${endTimeStr}</span>
@@ -756,17 +1034,9 @@
                   ${place.name}
                   ${place.isLocked ? `<span class="tag-lock"><i class="fa-solid fa-lock"></i> ล็อกเวลา</span>` : ''}
                 </div>
-                <div class="place-duration-controls">
-                  <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
-                  <span class="dur-text">${place.duration} นาที</span>
-                  <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
-                </div>
+                ${controlsHtml}
               </div>
-              <div class="place-actions">
-                <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
-                <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
-                ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
-              </div>
+              ${actionsHtml}
             </div>
           `;
 
@@ -807,11 +1077,39 @@
 
           const card = document.createElement('div');
           card.className = `place-card ${place.isLocked ? 'is-locked' : ''}`;
-          card.draggable = true;
+          card.draggable = isEditMode;
           card.dataset.index = index;
 
+          const dragHandleHtml = isEditMode
+            ? `<div class="drag-handle" title="ลากเพื่อขยับตำแหน่ง"><i class="fa-solid fa-grip-vertical"></i></div>`
+            : `<div class="drag-handle disabled" title="เปิดโหมดแก้ไขก่อนขยับ"><i class="fa-solid fa-lock" style="font-size: 0.85rem; opacity: 0.5;"></i></div>`;
+
+          const controlsHtml = isEditMode
+            ? `
+              <div class="place-duration-controls">
+                <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
+                <span class="dur-text">${place.duration} นาที</span>
+                <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
+              </div>
+            `
+            : `
+              <div class="place-duration-controls">
+                <span class="dur-text" style="opacity: 0.8;"><i class="fa-regular fa-clock"></i> ${place.duration} นาที</span>
+              </div>
+            `;
+
+          const actionsHtml = isEditMode
+            ? `
+              <div class="place-actions">
+                <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
+                <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
+                ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
+            `
+            : '';
+
           card.innerHTML = `
-            <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+            ${dragHandleHtml}
             <div class="place-time-badge">
               <span class="time-start">${startTimeStr}</span>
               <span class="time-end">${endTimeStr}</span>
@@ -821,17 +1119,9 @@
                 ${place.name}
                 ${place.isLocked ? `<span class="tag-lock"><i class="fa-solid fa-lock"></i> ล็อกเวลา</span>` : ''}
               </div>
-              <div class="place-duration-controls">
-                <button class="dur-btn" onclick="updateDuration(${index}, -15)">-</button>
-                <span class="dur-text">${place.duration} นาที</span>
-                <button class="dur-btn" onclick="updateDuration(${index}, 15)">+</button>
-              </div>
+              ${controlsHtml}
             </div>
-            <div class="place-actions">
-              <button class="action-btn" onclick="movePlace(${index}, -1)"><i class="fa-solid fa-chevron-up"></i></button>
-              <button class="action-btn" onclick="movePlace(${index}, 1)"><i class="fa-solid fa-chevron-down"></i></button>
-              ${!place.isLocked ? `<button class="action-btn del" onclick="deletePlace(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}
-            </div>
+            ${actionsHtml}
           `;
 
           attachDragAndTouchEvents(card, index);
@@ -844,21 +1134,25 @@
       }
     }
 
-    // Drag & Touch Event Manager (PC Mouse + Mobile Touch Drag Engine)
+    // Drag & Touch Event Manager (Protected by isEditMode)
     let dragSrcIndex = null;
     let touchDragIndex = null;
     let avatarEl = null;
     let touchOffsetY = 0;
 
     function attachDragAndTouchEvents(element, index) {
+      if (!isEditMode) return; // Do not attach active drag handlers when read-only!
+
       // 1. Desktop HTML5 Drag & Drop
       element.addEventListener('dragstart', function(e) {
+        if (!isEditMode) return;
         dragSrcIndex = index;
         this.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
       });
 
       element.addEventListener('dragover', function(e) {
+        if (!isEditMode) return;
         if (e.preventDefault) e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         this.classList.add('drag-over');
@@ -870,6 +1164,7 @@
       });
 
       element.addEventListener('drop', function(e) {
+        if (!isEditMode) return;
         if (e.stopPropagation) e.stopPropagation();
         this.classList.remove('drag-over');
         const dropIndex = Number(this.dataset.index);
@@ -887,14 +1182,17 @@
         document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
       });
 
-      // 2. Ultra-Smooth Touch Drag Engine for Smartphones & Tablets
+      // 2. Mobile Touch Drag Engine
       const handle = element.querySelector('.drag-handle') || element;
       const cardTarget = element.querySelector('.place-card') || element;
 
       handle.addEventListener('touchstart', function(e) {
+        if (!isEditMode) {
+          showToast('<i class="fa-solid fa-lock" style="color: var(--accent-orange);"></i> กรุณาคลิกเปิดโหมดแก้ไขก่อนขยับสถานที่');
+          return;
+        }
         if (e.touches.length !== 1) return;
         const target = e.target;
-        // Don't trigger drag when clicking buttons/controls
         if (target.closest('.dur-btn') || target.closest('.action-btn') || target.closest('input')) return;
 
         touchDragIndex = index;
@@ -902,7 +1200,6 @@
         const rect = cardTarget.getBoundingClientRect();
         touchOffsetY = touch.clientY - rect.top;
 
-        // Create Floating Drag Avatar Preview
         avatarEl = cardTarget.cloneNode(true);
         avatarEl.classList.add('touch-drag-avatar');
         avatarEl.style.left = rect.left + 'px';
@@ -914,14 +1211,13 @@
       }, { passive: false });
 
       handle.addEventListener('touchmove', function(e) {
-        if (touchDragIndex === null || !avatarEl) return;
-        if (e.cancelable) e.preventDefault(); // Stop page scrolling during touch drag!
+        if (!isEditMode || touchDragIndex === null || !avatarEl) return;
+        if (e.cancelable) e.preventDefault();
 
         const touch = e.touches[0];
         const currentY = touch.clientY;
         avatarEl.style.top = (currentY - touchOffsetY) + 'px';
 
-        // Highlight hovered target node
         const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
         const closestNode = targetEl ? targetEl.closest('[data-index]') : null;
 
@@ -930,7 +1226,6 @@
           closestNode.classList.add('drag-over');
         }
 
-        // Auto-scroll screen when dragging near viewport edges
         const viewportHeight = window.innerHeight;
         if (currentY < 75) {
           window.scrollBy(0, -8);
@@ -954,7 +1249,7 @@
 
         document.querySelectorAll('[data-index]').forEach(el => el.classList.remove('drag-over'));
 
-        if (closestNode) {
+        if (closestNode && isEditMode) {
           const dropIndex = Number(closestNode.dataset.index);
           if (touchDragIndex !== dropIndex) {
             const places = itineraryData[currentDay].places;
@@ -976,6 +1271,18 @@
         document.querySelectorAll('[data-index]').forEach(el => el.classList.remove('drag-over'));
         touchDragIndex = null;
       });
+    }
+
+    // Handle Add Place Click
+    function handleAddClick() {
+      if (!isEditMode) {
+        if (confirm('คุณอยู่ในโหมดอ่านอย่างเดียว ต้องการเปิดโหมดแก้ไขเพื่อเพิ่มสถานที่ใช่หรือไม่?')) {
+          toggleEditMode();
+          openAddModal();
+        }
+      } else {
+        openAddModal();
+      }
     }
 
     // Switch View Mode ('route' | 'list')
@@ -1005,6 +1312,7 @@
 
     // Up/Down Move Buttons
     function movePlace(index, direction) {
+      if (!isEditMode) return;
       const places = itineraryData[currentDay].places;
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= places.length) return;
@@ -1018,6 +1326,7 @@
 
     // Adjust Duration
     function updateDuration(index, delta) {
+      if (!isEditMode) return;
       const place = itineraryData[currentDay].places[index];
       if (place.duration + delta >= 15) {
         place.duration += delta;
@@ -1027,6 +1336,7 @@
 
     // Delete Item
     function deletePlace(index) {
+      if (!isEditMode) return;
       itineraryData[currentDay].places.splice(index, 1);
       renderSchedule();
     }
@@ -1056,10 +1366,13 @@
 
       closeAddModal();
       renderSchedule();
+      showToast('<i class="fa-solid fa-plus" style="color: var(--accent-green);"></i> เพิ่มสถานที่ใหม่เรียบร้อย');
     }
 
     // Init App
     window.onload = function() {
+      loadPlanFromLocalStorage();
+      updateEditModeUI();
       renderSchedule();
     };
   </script>
