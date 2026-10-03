@@ -49,6 +49,7 @@
       color: var(--text-main);
       min-height: 100vh;
       padding-bottom: 60px;
+      touch-action: manipulation;
     }
 
     .container {
@@ -212,18 +213,21 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
       position: relative;
+      user-select: none;
     }
 
     .place-card.dragging {
-      opacity: 0.4;
+      opacity: 0.35;
       border-color: var(--accent-green);
+      transform: scale(0.98);
     }
 
-    .place-card.drag-over {
-      border: 2px dashed var(--accent-green);
-      box-shadow: 0 0 15px var(--accent-green-glow);
+    .place-card.drag-over, .timeline-item-wrapper.drag-over .place-card {
+      border: 2px dashed var(--accent-green) !important;
+      box-shadow: 0 0 18px var(--accent-green-glow) !important;
+      background: rgba(0, 230, 118, 0.12) !important;
     }
 
     .place-card.is-locked {
@@ -234,9 +238,12 @@
     .drag-handle {
       color: var(--text-muted);
       cursor: grab;
-      padding: 6px;
-      font-size: 1.1rem;
+      padding: 8px 4px;
+      font-size: 1.2rem;
       touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .drag-handle:active {
@@ -301,10 +308,10 @@
       background: rgba(255, 255, 255, 0.1);
       border: none;
       color: #fff;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -445,6 +452,19 @@
 
     .route-travel-badge i {
       font-size: 0.8rem;
+    }
+
+    /* Mobile Touch Drag Ghost Avatar */
+    .touch-drag-avatar {
+      position: fixed !important;
+      z-index: 99999 !important;
+      pointer-events: none !important;
+      opacity: 0.95 !important;
+      transform: scale(1.03) rotate(1deg) !important;
+      box-shadow: 0 16px 35px rgba(0, 230, 118, 0.45), 0 0 20px rgba(0, 229, 255, 0.4) !important;
+      border: 2px solid var(--accent-green) !important;
+      background: #1A2E3B !important;
+      border-radius: var(--radius) !important;
     }
 
     /* Modal Styling */
@@ -824,11 +844,14 @@
       }
     }
 
-    // Drag & Touch Event Manager
+    // Drag & Touch Event Manager (PC Mouse + Mobile Touch Drag Engine)
     let dragSrcIndex = null;
+    let touchDragIndex = null;
+    let avatarEl = null;
+    let touchOffsetY = 0;
 
     function attachDragAndTouchEvents(element, index) {
-      // HTML5 Drag & Drop
+      // 1. Desktop HTML5 Drag & Drop
       element.addEventListener('dragstart', function(e) {
         dragSrcIndex = index;
         this.classList.add('dragging');
@@ -864,18 +887,41 @@
         document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
       });
 
-      // Mobile Touch Dragging via Handle
-      const handle = element.querySelector('.drag-handle');
-      if (!handle) return;
+      // 2. Ultra-Smooth Touch Drag Engine for Smartphones & Tablets
+      const handle = element.querySelector('.drag-handle') || element;
+      const cardTarget = element.querySelector('.place-card') || element;
 
       handle.addEventListener('touchstart', function(e) {
-        dragSrcIndex = index;
+        if (e.touches.length !== 1) return;
+        const target = e.target;
+        // Don't trigger drag when clicking buttons/controls
+        if (target.closest('.dur-btn') || target.closest('.action-btn') || target.closest('input')) return;
+
+        touchDragIndex = index;
+        const touch = e.touches[0];
+        const rect = cardTarget.getBoundingClientRect();
+        touchOffsetY = touch.clientY - rect.top;
+
+        // Create Floating Drag Avatar Preview
+        avatarEl = cardTarget.cloneNode(true);
+        avatarEl.classList.add('touch-drag-avatar');
+        avatarEl.style.left = rect.left + 'px';
+        avatarEl.style.top = (touch.clientY - touchOffsetY) + 'px';
+        avatarEl.style.width = rect.width + 'px';
+        document.body.appendChild(avatarEl);
+
         element.classList.add('dragging');
-      }, { passive: true });
+      }, { passive: false });
 
       handle.addEventListener('touchmove', function(e) {
-        if (dragSrcIndex === null) return;
+        if (touchDragIndex === null || !avatarEl) return;
+        if (e.cancelable) e.preventDefault(); // Stop page scrolling during touch drag!
+
         const touch = e.touches[0];
+        const currentY = touch.clientY;
+        avatarEl.style.top = (currentY - touchOffsetY) + 'px';
+
+        // Highlight hovered target node
         const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
         const closestNode = targetEl ? targetEl.closest('[data-index]') : null;
 
@@ -883,11 +929,25 @@
         if (closestNode && closestNode !== element) {
           closestNode.classList.add('drag-over');
         }
-      }, { passive: true });
+
+        // Auto-scroll screen when dragging near viewport edges
+        const viewportHeight = window.innerHeight;
+        if (currentY < 75) {
+          window.scrollBy(0, -8);
+        } else if (currentY > viewportHeight - 75) {
+          window.scrollBy(0, 8);
+        }
+      }, { passive: false });
 
       handle.addEventListener('touchend', function(e) {
-        if (dragSrcIndex === null) return;
+        if (touchDragIndex === null) return;
+        
+        if (avatarEl) {
+          avatarEl.remove();
+          avatarEl = null;
+        }
         element.classList.remove('dragging');
+
         const touch = e.changedTouches[0];
         const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
         const closestNode = targetEl ? targetEl.closest('[data-index]') : null;
@@ -896,14 +956,25 @@
 
         if (closestNode) {
           const dropIndex = Number(closestNode.dataset.index);
-          if (dragSrcIndex !== dropIndex) {
+          if (touchDragIndex !== dropIndex) {
             const places = itineraryData[currentDay].places;
-            const [draggedItem] = places.splice(dragSrcIndex, 1);
+            const [draggedItem] = places.splice(touchDragIndex, 1);
             places.splice(dropIndex, 0, draggedItem);
             renderSchedule();
           }
         }
-        dragSrcIndex = null;
+
+        touchDragIndex = null;
+      });
+
+      handle.addEventListener('touchcancel', function() {
+        if (avatarEl) {
+          avatarEl.remove();
+          avatarEl = null;
+        }
+        element.classList.remove('dragging');
+        document.querySelectorAll('[data-index]').forEach(el => el.classList.remove('drag-over'));
+        touchDragIndex = null;
       });
     }
 
@@ -928,7 +999,7 @@
       });
       const icon = currentView === 'route' ? 'fa-route' : 'fa-list-check';
       const modeText = currentView === 'route' ? 'เส้นทางไทม์ไลน์' : 'รายการสถานที่';
-      document.getElementById('dayTitle').innerHTML = `<i class="fa-solid ${icon}" style="color: var(--accent-blue);"></i> ${modeText} วันที่ ${dayNum}`;
+      document.getElementById('dayTitle').innerHTML = `<i class="fa-solid ${icon}" style="color: var(--accent-blue);"></i> ${modeText} วันที่ ${currentDay}`;
       renderSchedule();
     }
 
